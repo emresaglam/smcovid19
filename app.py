@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 import json
 import requests
 import datetime
@@ -29,9 +29,12 @@ def get_sm():
                           "deaths": int(deaths),
                           "confirmed": int(confirmed),
                           "total": int(total)}
+
     san_mateo_covid_19_s = json.dumps(san_mateo_covid_19)
+    response = jsonify(san_mateo_covid_19)
+    response.status_code = 200
     print(san_mateo_covid_19_s)
-    return san_mateo_covid_19_s
+    return response
 
 
 
