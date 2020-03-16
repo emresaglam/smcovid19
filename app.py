@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 import json
 import requests
 import requests_cache
@@ -25,7 +25,7 @@ def get_sm():
 
     date_time_obj = datetime.datetime.strptime(updated_at, '%m/%d/%Y at %H:%M:%S%z')
 
-    print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {} (Cached response: {}"
+    print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {} (Cached response: {})"
           .format(deaths, confirmed, total, r.from_cache))
 
     san_mateo_covid_19 = {"last_update": date_time_obj.isoformat(),
@@ -34,8 +34,7 @@ def get_sm():
                           "total": total}
 
     san_mateo_covid_19_s = json.dumps(san_mateo_covid_19)
-    response = jsonify(san_mateo_covid_19)
-    response.status_code = 200
+    response = san_mateo_covid_19
     print(san_mateo_covid_19_s)
     return response
 
@@ -43,14 +42,18 @@ def get_sm():
 
 @app.route('/')
 def api_root():
-    return "Oh hai! This is an API endpoint and this is not the URL you're looking for :)"
+    sm_data = get_sm()
+
+    return render_template("index.html", total = sm_data["total"], deaths = sm_data["deaths"]
+                           , confirmed = sm_data["confirmed"])
+        #"Oh hai! This is an API endpoint and this is not the URL you're looking for :)"
 
 
 @app.route("/sm", methods=['GET'])
 def sm():
     sm_data = get_sm()
+    return jsonify(sm_data)
 
-    return sm_data
 
 if __name__ == '__main__':
     if os.environ.get('AIR_PORT'):
