@@ -1,12 +1,13 @@
 from flask import Flask, jsonify
 import json
 import requests
-#import requests_cache
+import requests_cache
 import datetime
 from bs4 import BeautifulSoup as BS
 import os
 
 app = Flask(__name__)
+requests_cache.install_cache(cache_name='smhealth_cache', backend='sqlite', expire_after=600)
 
 baseurl = "https://www.smchealth.org/coronavirus"
 
@@ -24,7 +25,8 @@ def get_sm():
 
     date_time_obj = datetime.datetime.strptime(updated_at, '%m/%d/%Y at %H:%M:%S%z')
 
-    print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {}".format(deaths, confirmed, total))
+    print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {} (Cached response: {}"
+          .format(deaths, confirmed, total, r.from_cache))
 
     san_mateo_covid_19 = {"last_update": date_time_obj.isoformat(),
                           "deaths": int(deaths),
