@@ -10,6 +10,7 @@ app = Flask(__name__)
 
 baseurl = "https://www.smchealth.org/coronavirus"
 
+
 def get_sm():
     r = requests.get(baseurl)
 
