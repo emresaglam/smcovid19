@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 import json
 import requests
-import requests_cache
+#import requests_cache
 import datetime
 from bs4 import BeautifulSoup as BS
 import os
