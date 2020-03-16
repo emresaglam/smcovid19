@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 import json
 import requests
+import requests_cache
 import datetime
 from bs4 import BeautifulSoup as BS
 import os
@@ -17,8 +18,7 @@ def get_sm():
     ctable = soup.table
     deaths = ctable.find_all("tr")[2].find_all("td")[1].text
     confirmed = ctable.find_all("tr")[1].find_all("td")[1].text
-    total = ctable.find_all("tr")[3].find_all("td")[1].text
-
+    total = int(confirmed) + int(deaths)
     updated_at = soup.find_all("em")[0].text.split(u"\xa0")[1] + ":00-08:00"
 
     date_time_obj = datetime.datetime.strptime(updated_at, '%m/%d/%Y at %H:%M:%S%z')
@@ -28,7 +28,7 @@ def get_sm():
     san_mateo_covid_19 = {"last_update": date_time_obj.isoformat(),
                           "deaths": int(deaths),
                           "confirmed": int(confirmed),
-                          "total": int(total)}
+                          "total": total}
 
     san_mateo_covid_19_s = json.dumps(san_mateo_covid_19)
     response = jsonify(san_mateo_covid_19)
