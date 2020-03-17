@@ -46,9 +46,9 @@ def get_sm():
     deaths = ctable.find_all("tr")[2].find_all("td")[1].text
     confirmed = ctable.find_all("tr")[1].find_all("td")[1].text
     total = int(confirmed) + int(deaths)
-    updated_at = soup.find_all("em")[0].text.split(u"\xa0")[1] + ":00-08:00"
+    updated_at = soup.find_all("em")[0].text.split(u"\xa0")[1]
 
-    date_time_obj = datetime.datetime.strptime(updated_at, '%m/%d/%Y at %H:%M:%S%z')
+    date_time_obj = datetime.datetime.strptime(updated_at[:-4], '%m/%d/%Y at %H:%M')
 
     print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {} (Cached response: {})"
           .format(deaths, confirmed, total, r.from_cache))
