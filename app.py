@@ -10,6 +10,31 @@ import os
 app = Flask(__name__)
 requests_cache.install_cache(cache_name='smhealth_cache', backend='sqlite', expire_after=600)
 
+def get_sc():
+    import json
+    import re
+    baseurl = "https://www.sccgov.org/sites/phd/DiseaseInformation/novel-coronavirus/Pages/home.aspx"
+    r = requests.get(baseurl)
+    sc = BS(r.text, features="html.parser")
+    scripts = sc.find_all("script")
+    p = re.compile("\{.*\}")
+    # WTF is going on below? I'm glad you asked
+    # the data that we are looking for is in a script tag as a JSON Object. To be exact the 24th script in the page
+    # Since JSON objects start and end with {} that;;s what we search in the script, extract, loads to a dictionary
+    scdata = json.loads(p.search(scripts[23].text).group(0))
+    confirmed = scdata["Total_Confirmed_Cases"]
+    deaths = scdata["Deaths"]
+    total = confirmed
+    updated_at = datetime.datetime.fromtimestamp(
+        int(scdata["Modified"].split("(")[1].split("}")[0].split(")")[0][:-3])).isoformat()
+    santa_clara_covid_19 = {"last_update": updated_at,
+                            "deaths": deaths,
+                            "confirmed": confirmed,
+                            "total": total}
+    print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {} (Cached response: {})"
+          .format(deaths, confirmed, total, r.from_cache))
+
+    return santa_clara_covid_19
 
 def get_sm():
     baseurl = "https://www.smchealth.org/coronavirus"
@@ -78,6 +103,12 @@ def sm():
 def sf():
     sf_data = get_sf()
     return jsonify(sf_data)
+
+@app.route("/sc", methods=['GET'])
+def sc():
+    sc_data = get_sc()
+    return jsonify(sc_data)
+
 
 if __name__ == '__main__':
     if os.environ.get('AIR_PORT'):
