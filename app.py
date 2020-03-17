@@ -3,6 +3,7 @@ import json
 import requests
 import requests_cache
 import datetime
+from pytz import timezone
 from bs4 import BeautifulSoup as BS
 import os
 
@@ -44,11 +45,11 @@ def get_sf():
     sm.find_all("div", {"class": "box2"})
     confirmed = int(sm.find_all("div", {"class", "box2"})[0].find_all("p")[0].text.split(":")[1])
     deaths = int(sm.find_all("div", {"class", "box2"})[0].find_all("p")[1].text.split(":")[1])
-    if datetime.datetime.now().hour < 10:
-        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    if datetime.datetime.now(tz=timezone("US/Pacific")).hour < 10:
+        yesterday = datetime.datetime.now(tz=timezone("US/Pacific")) - datetime.timedelta(days=1)
         updated_at = yesterday.replace(hour=10, minute=0,second=0,microsecond=0).isoformat()
     else:
-        updated_at = datetime.datetime.now().replace(hour=10, minute=0,second=0,microsecond=0).isoformat()
+        updated_at = datetime.datetime.now(tz=timezone("US/Pacific")).replace(hour=10, minute=0,second=0,microsecond=0).isoformat()
     total = deaths+confirmed
 
     san_francisco_covid_19 = {"last_update": updated_at,
