@@ -9,10 +9,9 @@ import os
 app = Flask(__name__)
 requests_cache.install_cache(cache_name='smhealth_cache', backend='sqlite', expire_after=600)
 
-baseurl = "https://www.smchealth.org/coronavirus"
-
 
 def get_sm():
+    baseurl = "https://www.smchealth.org/coronavirus"
     r = requests.get(baseurl)
 
     soup = BS(r.text, features="html.parser")
@@ -38,7 +37,27 @@ def get_sm():
     print(san_mateo_covid_19_s)
     return response
 
+def get_sf():
+    baseurl = "https://www.sfdph.org/dph/alerts/coronavirus.asp"
+    r = requests.get(baseurl)
+    sm = BS(r.text, features="html.parser")
+    sm.find_all("div", {"class": "box2"})
+    confirmed = int(sm.find_all("div", {"class", "box2"})[0].find_all("p")[0].text.split(":")[1])
+    deaths = int(sm.find_all("div", {"class", "box2"})[0].find_all("p")[1].text.split(":")[1])
+    if datetime.datetime.now().hour < 10:
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        updated_at = yesterday.replace(hour=10, minute=0,second=0,microsecond=0).isoformat()
+    else:
+        updated_at = datetime.datetime.now().replace(hour=10, minute=0,second=0,microsecond=0).isoformat()
+    total = deaths+confirmed
 
+    san_francisco_covid_19 = {"last_update": updated_at,
+                              "deaths": deaths,
+                              "confirmed": confirmed,
+                              "total": total}
+    print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {} (Cached response: {})"
+          .format(deaths, confirmed, total, r.from_cache))
+    return san_francisco_covid_19
 
 @app.route('/')
 def api_root():
@@ -54,6 +73,10 @@ def sm():
     sm_data = get_sm()
     return jsonify(sm_data)
 
+@app.route("/sf", methods=['GET'])
+def sf():
+    sf_data = get_sf()
+    return jsonify(sf_data)
 
 if __name__ == '__main__':
     if os.environ.get('AIR_PORT'):
