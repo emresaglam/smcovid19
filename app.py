@@ -37,6 +37,7 @@ def get_sc():
     return santa_clara_covid_19
 
 def get_sm():
+    import re
     baseurl = "https://www.smchealth.org/coronavirus"
     r = requests.get(baseurl)
 
@@ -46,9 +47,10 @@ def get_sm():
     deaths = ctable.find_all("tr")[2].find_all("td")[1].text
     confirmed = ctable.find_all("tr")[1].find_all("td")[1].text
     total = int(confirmed) + int(deaths)
-    updated_at = soup.find_all("em")[0].text.split(u"\xa0")[1]
-
-    date_time_obj = datetime.datetime.strptime(updated_at[:-4], '%m/%d/%Y at %H:%M')
+    updated_as = soup.find_all("em")[0].text
+    p = re.compile("\d\d/\d\d/\d\d\d\d at \d\d:\d\d")
+    updated_at = p.search(updated_as).group(0)
+    date_time_obj = datetime.datetime.strptime(updated_at, '%m/%d/%Y at %H:%M')
 
     print("San Mateo stats: Deaths: {}, Confirmed: {}, Total: {} (Cached response: {})"
           .format(deaths, confirmed, total, r.from_cache))
