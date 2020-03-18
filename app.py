@@ -22,9 +22,9 @@ def get_sc():
     # the data that we are looking for is in a script tag as a JSON Object. To be exact the 24th script in the page
     # Since JSON objects start and end with {} that;;s what we search in the script, extract, loads to a dictionary
     scdata = json.loads(p.search(scripts[23].text).group(0))
-    confirmed = scdata["Total_Confirmed_Cases"]
-    deaths = scdata["Deaths"]
-    total = confirmed
+    confirmed = int(scdata["Total_Confirmed_Cases"])
+    deaths = int(scdata["Deaths"])
+    total = int(confirmed)
     updated_at = datetime.datetime.fromtimestamp(
         int(scdata["Modified"].split("(")[1].split("}")[0].split(")")[0][:-3])).isoformat()
     santa_clara_covid_19 = {"last_update": updated_at,
