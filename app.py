@@ -102,7 +102,7 @@ def sm():
         sm_data = get_sm()
     except ValueError:
         print("oops! We had a parsing error for SM")
-        return Response(status=503)
+        return render_template("500.html"), 500
     return jsonify(sm_data)
 
 @app.route("/sf", methods=['GET'])
@@ -111,7 +111,7 @@ def sf():
         sf_data = get_sf()
     except ValueError:
         print("oops! We had a parsing error for SF")
-        return Response(status=503)
+        return render_template("500.html"), 500
     return jsonify(sf_data)
 
 @app.route("/sc", methods=['GET'])
@@ -120,7 +120,7 @@ def sc():
         sc_data = get_sc()
     except ValueError:
         print("oops! We had a parsing error for SC")
-        return Response(status=503)
+        return render_template("500.html"), 500
     return jsonify(sc_data)
 
 
