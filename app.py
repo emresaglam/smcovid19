@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, Response
+from flask import Flask, jsonify, render_template, redirect
 import json
 import requests
 import requests_cache
@@ -116,12 +116,8 @@ def sf():
 
 @app.route("/sc", methods=['GET'])
 def sc():
-    try:
-        sc_data = get_sc()
-    except ValueError:
-        print("oops! We had a parsing error for SC")
-        return render_template("500.html"), 500
-    return jsonify(sc_data)
+    url="https://www.sccgov.org/sites/phd/DiseaseInformation/novel-coronavirus/Pages/dashboard.aspx"
+    return redirect(url, code=302)
 
 
 if __name__ == '__main__':
