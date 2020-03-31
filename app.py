@@ -89,21 +89,14 @@ def get_sf():
 
 @app.route('/')
 def api_root():
-    sm_data = get_sm()
-
-    return render_template("index.html", total = sm_data["total"], deaths = sm_data["deaths"]
-                           , confirmed = sm_data["confirmed"])
-        #"Oh hai! This is an API endpoint and this is not the URL you're looking for :)"
-
+    #sm_data = get_sm()
+    url = "https://www.smchealth.org/coronavirus"
+    return redirect(url, code=302)
 
 @app.route("/sm", methods=['GET'])
 def sm():
-    try:
-        sm_data = get_sm()
-    except ValueError:
-        print("oops! We had a parsing error for SM")
-        return render_template("500.html"), 500
-    return jsonify(sm_data)
+    url="https://www.smchealth.org/coronavirus"
+    return redirect(url, code=302)
 
 @app.route("/sf", methods=['GET'])
 def sf():
